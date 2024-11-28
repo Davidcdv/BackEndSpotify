@@ -29,17 +29,27 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 const httpServer = createServer(app);
 initializeSocket(httpServer);
 // Get the frontend URL based on the environment (development or production)
-const allowedOrigin =
-  process.env.NODE_ENV === "production"
-    ? "https://frontendspotify1.onrender.com" // Replace with your live frontend URL
-    : "http://localhost:3000"; // Local development URL
+
+
+const allowedOrigins = [
+  "http://localhost:3000", // Local development frontend
+  "https://frontendspotify1.onrender.com", // Deployed frontend
+];
 
 app.use(
   cors({
-    origin: allowedOrigin, // Dynamically set the origin
-    credentials: true, // Allow credentials (cookies, etc.)
+    origin: (origin, callback) => {
+      // Allow requests with no 'origin' (like Postman or server-side calls)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // Allow cookies and credentials
   })
 );
+
 
 app.use(express.json()); // to parse req.body
 app.use(clerkMiddleware()); // this will add auth to req obj => req.auth

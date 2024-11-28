@@ -26,12 +26,18 @@ const PORT = process.env.PORT;
 
 const httpServer = createServer(app);
 initializeSocket(httpServer);
+// Get the frontend URL based on the environment (development or production)
+const allowedOrigin =
+  process.env.NODE_ENV === "production"
+    ? "https://frontendspotify1.onrender.com" // Replace with your live frontend URL
+    : "http://localhost:3000"; // Local development URL
 
+// CORS configuration
 app.use(
-	cors({
-		origin: "http://localhost:3000",
-		credentials: true,
-	})
+  cors({
+    origin: allowedOrigin,
+    credentials: true, // Allow credentials (cookies, etc.)
+  })
 );
 
 app.use(express.json()); // to parse req.body
